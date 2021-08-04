@@ -90,7 +90,11 @@ async def _(bot: Bot, event: Event, state: T_State):
             music_data = total_list.filter(level=level, type=tp)
         else:
             music_data = total_list.filter(level=level, diff=['绿黄红紫白'.index(res.groups()[1])], type=tp)
-        await spec_rand.send(song_txt(music_data.random()))
+        if len(music_data) == 0:
+            rand_result = "没有这样的乐曲哦。"
+        else:
+            rand_result = song_txt(music_data.random())
+        await spec_rand.send(rand_result)
     except Exception as e:
         print(e)
         await spec_rand.finish("随机命令错误，请检查语法")
