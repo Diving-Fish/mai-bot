@@ -155,8 +155,7 @@ TAP: {chart['notes'][0]}
 HOLD: {chart['notes'][1]}
 SLIDE: {chart['notes'][2]}
 BREAK: {chart['notes'][3]}
-谱师: {chart['charter']}
-'''
+谱师: {chart['charter']}'''
             else:
                 msg = f'''{level_name[level_index]} {level}({ds})
 TAP: {chart['notes'][0]}
@@ -164,8 +163,7 @@ HOLD: {chart['notes'][1]}
 SLIDE: {chart['notes'][2]}
 TOUCH: {chart['notes'][3]}
 BREAK: {chart['notes'][4]}
-谱师: {chart['charter']}
-'''
+谱师: {chart['charter']}'''
             await query_chart.send(Message([
                 {
                     "type": "text",
