@@ -118,11 +118,17 @@ async def _(bot: Bot, event: Event, state: T_State):
     if name == "":
         return
     res = total_list.filter(title_search=name)
-    await search_music.finish(Message([
-        {"type": "text",
-            "data": {
-                "text": f"{music['id']}. {music['title']}\n"
-            }} for music in res]))
+    if len(res) == 0:
+        await search_music.send("没有找到这样的乐曲。")
+    else:
+        search_result = ""
+        for music in res:
+            search_result += f"{music['id']}. {music['title']}\n"
+        await search_music.finish(Message([
+            {"type": "text",
+                "data": {
+                    "text": search_result.strip()
+                }}]))
 
 
 query_chart = on_regex(r"^([绿黄红紫白]?)id([0-9]+)")
