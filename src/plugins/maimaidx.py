@@ -42,7 +42,7 @@ def inner_level_q(ds1, ds2=None):
         music_data = total_list.filter(ds=(ds1, ds2))
     else:
         music_data = total_list.filter(ds=ds1)
-    for music in music_data:
+    for music in sorted(music_data, key = lambda i: int(i['id'])):
         for i in music.diff:
             result_set.append((music['id'], music['title'], music['ds'][i], diff_label[i], music['level'][i]))
     return result_set
@@ -122,7 +122,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         await search_music.send("没有找到这样的乐曲。")
     else:
         search_result = ""
-        for music in res:
+        for music in sorted(res, key = lambda i: int(i['id'])):
             search_result += f"{music['id']}. {music['title']}\n"
         await search_music.finish(Message([
             {"type": "text",
