@@ -42,7 +42,7 @@ def inner_level_q(ds1, ds2=None):
         music_data = total_list.filter(ds=(ds1, ds2))
     else:
         music_data = total_list.filter(ds=ds1)
-    for music in music_data:
+    for music in sorted(music_data, key = lambda i: int(i['id'])):
         for i in music.diff:
             result_set.append((music['id'], music['title'], music['ds'][i], diff_label[i], music['level'][i]))
     return result_set
@@ -62,7 +62,7 @@ async def _(bot: Bot, event: Event, state: T_State):
     else:
         result_set = inner_level_q(float(argv[0]), float(argv[1]))
     if len(result_set) > 50:
-        await inner_level.finish("数据超出 50 条，请尝试缩小查询范围")
+        await inner_level.finish(f"结果过多（{len(result_set)} 条），请缩小搜索范围。")
         return
     s = ""
     for elem in result_set:
@@ -120,15 +120,17 @@ async def _(bot: Bot, event: Event, state: T_State):
     res = total_list.filter(title_search=name)
     if len(res) == 0:
         await search_music.send("没有找到这样的乐曲。")
-    else:
+    elif len(res) < 50:
         search_result = ""
-        for music in res:
+        for music in sorted(res, key = lambda i: int(i['id'])):
             search_result += f"{music['id']}. {music['title']}\n"
         await search_music.finish(Message([
             {"type": "text",
                 "data": {
                     "text": search_result.strip()
                 }}]))
+    else:
+        await search_music.send(f"结果过多（{len(res)} 条），请缩小查询范围。")
 
 
 query_chart = on_regex(r"^([绿黄红紫白]?)id([0-9]+)")
