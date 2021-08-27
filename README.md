@@ -4,17 +4,29 @@
 
 ## Step 1. 安装 Python
 
-请自行前往 https://www.python.org/ 下载 Python 3 版本（> 3.7）并将其添加到环境变量（在安装过程中勾选 Add to system PATH）。在 Linux 系统上，可能需要其他方法安装 Python 3，请自行查找。
+请自行前往 https://www.python.org/ 下载 Python 3 版本（> 3.7）并将其添加到环境变量（在安装过程中勾选 Add Python to system PATH）。对大多数用户来说，您应该下载 Windows installer (64-bit)。
+
+在 Linux 系统上，可能需要其他方法安装 Python 3，请自行查找。
 
 ## Step 2. 运行项目
 
 建议使用 git 对此项目进行版本管理。您也可以直接在本界面下载代码的压缩包进行运行。
 
-在运行代码之前，您需要从[此链接](https://www.diving-fish.com/maibot/static.zip)下载资源文件并解压到`src`文件夹中。在此之后，输入
+在运行代码之前，您需要从[此链接](https://www.diving-fish.com/maibot/static.zip)下载资源文件并解压到`src`文件夹中。在此之后，**您需要打开控制台，并切换到该项目所在的目录。**
+在 Windows 10 系统上，您可以直接在项目的根目录（即 bot.py）文件所在的位置按下 Shift + 右键，点击【在此处打开 PowerShell 窗口】。
+如果您使用其他的操作系统，请自行查找关于`cd`命令的教程。
+
+之后，在打开的控制台中输入
+```
+python -version
+```
+控制台应该会打印出 Python 的版本。如果提示找不到 `python` 命令，请检查环境变量或干脆重装 Python，**并务必勾选 Add Python to system PATH**。
+
+之后，输入
 ```
 pip install -r requirements.txt
 ```
-安装依赖，之后运行
+安装依赖完成后，运行
 ```
 python bot.py
 ```
@@ -35,7 +47,8 @@ python bot.py
 
 前往 https://github.com/Mrs4s/go-cqhttp > Releases，下载适合自己操作系统的可执行文件。
 go-cqhttp 在初次启动时会询问代理方式，选择反向 websocket 代理即可。
-之后设置反向 ws 地址、上报方式：
+
+之后用任何文本编辑器打开`config.yml`文件，设置反向 ws 地址、上报方式：
 ```yml
 message:
   post-format: array
