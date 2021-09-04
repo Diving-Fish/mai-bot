@@ -18,7 +18,7 @@
 
 之后，在打开的控制台中输入
 ```
-python -version
+python --version
 ```
 控制台应该会打印出 Python 的版本。如果提示找不到 `python` 命令，请检查环境变量或干脆重装 Python，**并务必勾选 Add Python to system PATH**。
 
