@@ -44,6 +44,7 @@ python bot.py
 08-02 11:26:49 [INFO] uvicorn | Application startup complete.
 08-02 11:26:49 [INFO] uvicorn | Uvicorn running on http://127.0.0.1:10219 (Press CTRL+C to quit)
 ```
+**运行成功后请勿关闭此窗口，后续需要与 CQ-HTTP 连接。**
 
 ## Step 3. 连接 CQ-HTTP
 
