@@ -2,6 +2,8 @@
 
 此 README 提供了最低程度的 mai bot 教程与支持。
 
+**建议您至少拥有一定的编程基础之后再常识使用本工具。**
+
 ## Step 1. 安装 Python
 
 请自行前往 https://www.python.org/ 下载 Python 3 版本（> 3.7）并将其添加到环境变量（在安装过程中勾选 Add Python to system PATH）。对大多数用户来说，您应该下载 Windows installer (64-bit)。
