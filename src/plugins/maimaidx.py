@@ -9,6 +9,7 @@ from src.libraries.tool import hash
 from src.libraries.maimaidx_music import *
 from src.libraries.image import *
 from src.libraries.maimai_best_40 import generate
+from src.libraries.maimai_best_50 import generate50
 import re
 
 
@@ -345,6 +346,31 @@ async def _(bot: Bot, event: Event, state: T_State):
         await best_40_pic.send("该用户禁止了其他人获取数据。")
     else:
         await best_40_pic.send(Message([
+            {
+                "type": "image",
+                "data": {
+                    "file": f"base64://{str(image_to_base64(img), encoding='utf-8')}"
+                }
+            }
+        ]))
+
+best_50_pic = on_command('b50')
+
+
+@best_50_pic.handle()
+async def _(bot: Bot, event: Event, state: T_State):
+    username = str(event.get_message()).strip()
+    if username == "":
+        payload = {'qq': str(event.get_user_id()),'b50':True}
+    else:
+        payload = {'username': username,'b50':  True}
+    img, success = await generate50(payload)
+    if success == 400:
+        await best_50_pic.send("未找到此玩家，请确保此玩家的用户名和查分器中的用户名相同。")
+    elif success == 403:
+        await best_50_pic.send("该用户禁止了其他人获取数据。")
+    else:
+        await best_50_pic.send(Message([
             {
                 "type": "image",
                 "data": {
