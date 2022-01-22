@@ -5,10 +5,18 @@ from PIL import Image
 from nonebot import on_command, on_message, on_notice, require, get_driver, on_regex
 from nonebot.typing import T_State
 from nonebot.adapters.cqhttp import Message, Event, Bot
+from nonebot.exception import IgnoredException
+from nonebot.message import event_preprocessor
 from src.libraries.image import *
 from random import randint
 
 
+@event_preprocessor
+async def preprocessor(bot, event, state):
+    if hasattr(event, 'message_type') and event.message_type == "private" and event.sub_type != "friend":
+        raise IgnoredException("not reply group temp message")
+
+        
 help = on_command('help')
 
 
