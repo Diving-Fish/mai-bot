@@ -106,7 +106,7 @@ class MusicList(List[Music]):
 
     def by_title(self, music_title: str) -> Optional[Music]:
         for music in self:
-            if music.title == music_title:
+            if music.title.lower() == music_title.lower():
                 return music
         return None
 
