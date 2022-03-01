@@ -5,7 +5,7 @@ from nonebot.typing import T_State
 from nonebot.adapters import Event, Bot
 from nonebot.adapters.cqhttp import Message
 
-from src.libraries.tool import hash
+from src.libraries.tool import hash, get_music_by_alias, add_alias_request, get_chart
 from src.libraries.maimaidx_music import *
 from src.libraries.image import *
 from src.libraries.maimai_best_40 import generate
@@ -152,13 +152,15 @@ async def _(bot: Bot, event: Event, state: T_State):
             ds = music['ds'][level_index]
             level = music['level'][level_index]
             file = f"https://www.diving-fish.com/covers/{music['id']}.jpg"
+            # chart stat
+            chart_with_stat = await get_chart(music.id, str(level_index))
             if len(chart['notes']) == 4:
                 msg = f'''{level_name[level_index]} {level}({ds})
 TAP: {chart['notes'][0]}
 HOLD: {chart['notes'][1]}
 SLIDE: {chart['notes'][2]}
 BREAK: {chart['notes'][3]}
-谱师: {chart['charter']}'''
+谱师: {chart['charter']}\n'''
             else:
                 msg = f'''{level_name[level_index]} {level}({ds})
 TAP: {chart['notes'][0]}
@@ -166,7 +168,12 @@ HOLD: {chart['notes'][1]}
 SLIDE: {chart['notes'][2]}
 TOUCH: {chart['notes'][3]}
 BREAK: {chart['notes'][4]}
-谱师: {chart['charter']}'''
+谱师: {chart['charter']}\n'''
+            msg += f"""相对难度：{chart_with_stat["tag"]}
+SSS人数：{chart_with_stat["ssscount"]}/{chart_with_stat["playerCount"]}
+同等级难度排名：{chart_with_stat["difficultyRankInSameLevel"]}/{chart_with_stat["songCountInSameLevel"]}
+平均达成率：{'%.4f' % float(chart_with_stat["average"])}%
+            """
             await query_chart.send(Message([
                 {
                     "type": "text",
@@ -246,15 +253,6 @@ async def _(bot: Bot, event: Event, state: T_State):
     ] + song_txt(music)))
 
 
-music_aliases = defaultdict(list)
-f = open('src/static/aliases.csv', 'r', encoding='utf-8')
-tmp = f.readlines()
-f.close()
-for t in tmp:
-    arr = t.strip().split('\t')
-    for i in range(len(arr)):
-        if arr[i] != "":
-            music_aliases[arr[i].lower()].append(arr[0])
 
 
 find_song = on_regex(r".+是什么歌")
@@ -264,16 +262,37 @@ find_song = on_regex(r".+是什么歌")
 async def _(bot: Bot, event: Event, state: T_State):
     regex = "(.+)是什么歌"
     name = re.match(regex, str(event.get_message())).groups()[0].strip().lower()
-    if name not in music_aliases:
-        await find_song.finish("未找到此歌曲\n舞萌 DX 歌曲别名收集计划：https://docs.qq.com/sheet/DQ0pvUHh6b1hjcGpl")
-        return
-    result_set = music_aliases[name]
-    if len(result_set) == 1:
-        music = total_list.by_title(result_set[0])
+    musics = await get_music_by_alias(name)
+    size = len(musics)
+    if size == 0:
+        await find_song.finish("未查询到歌曲，可以使用\"XX的别名是XX来添加\"")
+    elif size == 1:
+        music = total_list.by_id(str(musics[0]["musicId"]))
         await find_song.finish(Message([{"type": "text", "data": {"text": "您要找的是不是"}}] + song_txt(music)))
+    elif len(musics) >= 20:
+        await find_song.finish("查询到" + str(len(musics)) + "首歌曲,请缩小范围")
     else:
-        s = '\n'.join(result_set)
-        await find_song.finish(f"您要找的可能是以下歌曲中的其中一首：\n{ s }")
+        s = ""
+        for music_dto in musics:
+            music = total_list.by_id(str(music_dto["musicId"]))
+            s += f"{music.title} ({music_dto['alias']})\n"
+        await find_song.finish(f"您要找的可能是以下歌曲中的其中一首：\n{s}")
+
+
+add_alias = on_regex(r".+的别名是.+")
+
+
+@add_alias.handle()
+async def _(bot: Bot, event: Event, state: T_State):
+    regex = "(.+)的别名是(.+)"
+    name = re.match(regex, str(event.get_message())).groups()[0].strip().lower()
+    alias = re.match(regex, str(event.get_message())).groups()[1].strip()
+    music = total_list.by_title(name)
+    if music is None:
+        await add_alias.finish(f"未找到名为{name}的歌曲")
+        return
+    result = await add_alias_request(music.id, alias)
+    await add_alias.finish(result["message"])
 
 
 query_score = on_command('分数线')
