@@ -5,7 +5,7 @@ from nonebot.typing import T_State
 from nonebot.adapters import Event, Bot
 from nonebot.adapters.cqhttp import Message
 
-from src.libraries.tool import hash, get_music_by_alias, add_alias_request
+from src.libraries.tool import hash, get_music_by_alias, add_alias_request, get_chart
 from src.libraries.maimaidx_music import *
 from src.libraries.image import *
 from src.libraries.maimai_best_40 import generate
@@ -152,13 +152,15 @@ async def _(bot: Bot, event: Event, state: T_State):
             ds = music['ds'][level_index]
             level = music['level'][level_index]
             file = f"https://www.diving-fish.com/covers/{music['id']}.jpg"
+            # chart stat
+            chart_with_stat = await get_chart(music.id, str(level_index))
             if len(chart['notes']) == 4:
                 msg = f'''{level_name[level_index]} {level}({ds})
 TAP: {chart['notes'][0]}
 HOLD: {chart['notes'][1]}
 SLIDE: {chart['notes'][2]}
 BREAK: {chart['notes'][3]}
-谱师: {chart['charter']}'''
+谱师: {chart['charter']}\n'''
             else:
                 msg = f'''{level_name[level_index]} {level}({ds})
 TAP: {chart['notes'][0]}
@@ -166,7 +168,12 @@ HOLD: {chart['notes'][1]}
 SLIDE: {chart['notes'][2]}
 TOUCH: {chart['notes'][3]}
 BREAK: {chart['notes'][4]}
-谱师: {chart['charter']}'''
+谱师: {chart['charter']}\n'''
+            msg += f"""相对难度：{chart_with_stat["tag"]}
+SSS人数：{chart_with_stat["ssscount"]}/{chart_with_stat["playerCount"]}
+同等级难度排名：{chart_with_stat["difficultyRankInSameLevel"]}/{chart_with_stat["songCountInSameLevel"]}
+平均达成率：{'%.4f' % float(chart_with_stat["average"])}%
+            """
             await query_chart.send(Message([
                 {
                     "type": "text",

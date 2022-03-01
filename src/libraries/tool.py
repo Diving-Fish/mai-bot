@@ -24,3 +24,11 @@ async def add_alias_request(music_id: str, alias: str):
             return None
         obj = await resp.json()
         return obj
+
+
+async def get_chart(music_id: str, difficult: str):
+    async with aiohttp.request("GET", f"https://maimai.ohara-rinne.tech/api/chart/{music_id}/{difficult}") as resp:
+        if resp.status != 200:
+            return None
+        obj = await resp.json()
+        return obj["data"]
