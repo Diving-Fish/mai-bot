@@ -214,7 +214,7 @@ class DrawBest(object):
             temp = self._resizePic(temp, itemW / temp.size[0])
             temp = temp.crop((0, (temp.size[1] - itemH) / 2, itemW, (temp.size[1] + itemH) / 2))
             temp = temp.filter(ImageFilter.GaussianBlur(3))
-            temp = temp.point(lambda p: p * 0.72)
+            temp = temp.point(lambda p: int(p * 0.72))
 
             tempDraw = ImageDraw.Draw(temp)
             tempDraw.polygon(levelTriagle, Color[chartInfo.diff])
@@ -239,7 +239,7 @@ class DrawBest(object):
             tempDraw.text((8, 60), f'#{num + 1}', 'white', font)
 
             recBase = Image.new('RGBA', (itemW, itemH), 'black')
-            recBase = recBase.point(lambda p: p * 0.8)
+            recBase = recBase.point(lambda p: int(p * 0.8))
             img.paste(recBase, (self.COLOUMS_IMG[j] + 5, self.ROWS_IMG[i + 1] + 5))
             img.paste(temp, (self.COLOUMS_IMG[j] + 4, self.ROWS_IMG[i + 1] + 4))
         for num in range(len(sdBest), sdBest.size):
@@ -263,7 +263,7 @@ class DrawBest(object):
             temp = self._resizePic(temp, itemW / temp.size[0])
             temp = temp.crop((0, (temp.size[1] - itemH) / 2, itemW, (temp.size[1] + itemH) / 2))
             temp = temp.filter(ImageFilter.GaussianBlur(3))
-            temp = temp.point(lambda p: p * 0.72)
+            temp = temp.point(lambda p: int(p * 0.72))
 
             tempDraw = ImageDraw.Draw(temp)
             tempDraw.polygon(levelTriagle, Color[chartInfo.diff])
@@ -289,7 +289,7 @@ class DrawBest(object):
             tempDraw.text((8, 60), f'#{num + 1}', 'white', font)
 
             recBase = Image.new('RGBA', (itemW, itemH), 'black')
-            recBase = recBase.point(lambda p: p * 0.8)
+            recBase = recBase.point(lambda p: int(p * 0.8))
             img.paste(recBase, (self.COLOUMS_IMG[j + 8] + 5, self.ROWS_IMG[i + 1] + 5))
             img.paste(temp, (self.COLOUMS_IMG[j + 8] + 4, self.ROWS_IMG[i + 1] + 4))
         for num in range(len(dxBest), dxBest.size):

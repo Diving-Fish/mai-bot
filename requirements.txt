@@ -22,7 +22,7 @@ multidict==5.1.0
 nb-cli==0.4.2
 nonebot-adapter-cqhttp==2.0.0a13
 nonebot2==2.0.0a13.post1
-Pillow==8.3.1
+Pillow==9.1.1
 poyo==0.5.0
 prompt-toolkit==1.0.14
 pydantic==1.8.2
