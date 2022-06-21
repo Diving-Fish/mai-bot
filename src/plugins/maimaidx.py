@@ -1,16 +1,17 @@
 from collections import defaultdict
-
 from nonebot import on_command, on_regex
 from nonebot.typing import T_State
 from nonebot.adapters import Event, Bot
-from nonebot.adapters.cqhttp import Message
-
+from nonebot.adapters.cqhttp import Message, MessageSegment
+import os
+import base64
 from src.libraries.tool import hash
 from src.libraries.maimaidx_music import *
 from src.libraries.image import *
 from src.libraries.maimai_best_40 import generate
 from src.libraries.maimai_best_50 import generate50
 import re
+import random
 
 
 def song_txt(music: Music):
@@ -34,6 +35,19 @@ def song_txt(music: Music):
             }
         }
     ])
+
+def img_4630_text():
+    pic_path = "/home/aya/images/4630/"
+    file_list = os.listdir(pic_path)
+    idx = random.randint(0, len(file_list) - 1)
+    f_path = pic_path + file_list[idx]
+    f_ = open(f_path, 'rb')
+    img_data = f_.read()
+    b64_data = base64.b64encode(img_data)
+    b64_data = b64_data.decode('utf-8')
+    b64_data = "base64://" + b64_data
+    print(b64_data)
+    return Message([MessageSegment.image(b64_data)])
 
 
 def inner_level_q(ds1, ds2=None):
@@ -107,6 +121,11 @@ mr = on_regex(r".*maimai.*什么")
 @mr.handle()
 async def _(bot: Bot, event: Event, state: T_State):
     await mr.finish(song_txt(total_list.random()))
+
+test_4630 = on_regex(r"4630")
+@test_4630.handle()
+async def _(bot: Bot, event: Event, state: T_State):
+    await test_4630.finish(img_4630_text())
 
 
 search_music = on_regex(r"^查歌.+")
@@ -239,7 +258,7 @@ async def _(bot: Bot, event: Event, state: T_State):
             s += f'宜 {wm_list[i]}\n'
         elif wm_value[i] == 0:
             s += f'忌 {wm_list[i]}\n'
-    s += "千雪提醒您：打机时不要大力拍打或滑动哦\n今日推荐歌曲："
+    s += "彩彩提醒您：打机时不要大力拍打或滑动哦\n今日推荐歌曲："
     music = total_list[h % len(total_list)]
     await jrwm.finish(Message([
         {"type": "text", "data": {"text": s}}

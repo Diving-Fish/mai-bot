@@ -9,6 +9,10 @@ from nonebot.exception import IgnoredException
 from nonebot.message import event_preprocessor
 from src.libraries.image import *
 from random import randint
+from pixivpy3 import *
+
+aapi = AppPixivAPI()
+
 
 
 @event_preprocessor
@@ -52,6 +56,7 @@ poke = on_notice(rule=_group_poke, priority=10, block=True)
 async def _(bot: Bot, event: Event, state: T_State):
     if event.__getattribute__('group_id') is None:
         event.__delattr__('group_id')
+    await poke.send("まんまるお山に彩りを!丸山彩でーす!")
     await poke.send(Message([{
         "type": "poke",
         "data": {
