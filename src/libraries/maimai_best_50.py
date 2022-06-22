@@ -5,7 +5,7 @@ from typing import Optional, Dict, List, Tuple
 
 import aiohttp
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
-from src.libraries.maimaidx_music import total_list
+from src.libraries.maimaidx_music import total_list, get_cover_len4_id
 
 
 scoreRank = 'D C B BB BBB A AA AAA S S+ SS SS+ SSS SSS+'.split(' ')
@@ -207,7 +207,7 @@ class DrawBest(object):
             i = num // 7
             j = num % 7
             chartInfo = sdBest[num]
-            pngPath = self.cover_dir + f'{chartInfo.idNum}.jpg'
+            pngPath = self.cover_dir + f'{get_cover_len4_id(chartInfo.idNum)}.png'
             if not os.path.exists(pngPath):
                 pngPath = self.cover_dir + '1000.png'
             temp = Image.open(pngPath).convert('RGB')
@@ -254,9 +254,7 @@ class DrawBest(object):
             i = num // 3
             j = num % 3
             chartInfo = dxBest[num]
-            pngPath = self.cover_dir + f'{int(chartInfo.idNum)}.jpg'
-            if not os.path.exists(pngPath):
-                pngPath = self.cover_dir + f'{int(chartInfo.idNum)}.png'
+            pngPath = self.cover_dir + f'{get_cover_len4_id(chartInfo.idNum)}.png'
             if not os.path.exists(pngPath):
                 pngPath = self.cover_dir + '1000.png'
             temp = Image.open(pngPath).convert('RGB')

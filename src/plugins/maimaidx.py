@@ -24,7 +24,7 @@ def song_txt(music: Music):
         {
             "type": "image",
             "data": {
-                "file": f"https://www.diving-fish.com/covers/{music.id}.jpg"
+                "file": f"https://www.diving-fish.com/covers/{get_cover_len4_id(music.id)}.png"
             }
         },
         {
@@ -151,7 +151,7 @@ async def _(bot: Bot, event: Event, state: T_State):
             chart = music['charts'][level_index]
             ds = music['ds'][level_index]
             level = music['level'][level_index]
-            file = f"https://www.diving-fish.com/covers/{music['id']}.jpg"
+            file = f"https://www.diving-fish.com/covers/{get_cover_len4_id(music['id'])}.png"
             if len(chart['notes']) == 4:
                 msg = f'''{level_name[level_index]} {level}({ds})
 TAP: {chart['notes'][0]}
@@ -193,7 +193,7 @@ BREAK: {chart['notes'][4]}
         name = groups[1]
         music = total_list.by_id(name)
         try:
-            file = f"https://www.diving-fish.com/covers/{music['id']}.jpg"
+            file =f"https://www.diving-fish.com/covers/{get_cover_len4_id(music['id'])}.png"
             await query_chart.send(Message([
                 {
                     "type": "text",
@@ -244,37 +244,6 @@ async def _(bot: Bot, event: Event, state: T_State):
     await jrwm.finish(Message([
         {"type": "text", "data": {"text": s}}
     ] + song_txt(music)))
-
-
-music_aliases = defaultdict(list)
-f = open('src/static/aliases.csv', 'r', encoding='utf-8')
-tmp = f.readlines()
-f.close()
-for t in tmp:
-    arr = t.strip().split('\t')
-    for i in range(len(arr)):
-        if arr[i] != "":
-            music_aliases[arr[i].lower()].append(arr[0])
-
-
-find_song = on_regex(r".+是什么歌")
-
-
-@find_song.handle()
-async def _(bot: Bot, event: Event, state: T_State):
-    regex = "(.+)是什么歌"
-    name = re.match(regex, str(event.get_message())).groups()[0].strip().lower()
-    if name not in music_aliases:
-        await find_song.finish("未找到此歌曲\n舞萌 DX 歌曲别名收集计划：https://docs.qq.com/sheet/DQ0pvUHh6b1hjcGpl")
-        return
-    result_set = music_aliases[name]
-    if len(result_set) == 1:
-        music = total_list.by_title(result_set[0])
-        await find_song.finish(Message([{"type": "text", "data": {"text": "您要找的是不是"}}] + song_txt(music)))
-    else:
-        s = '\n'.join(result_set)
-        await find_song.finish(f"您要找的可能是以下歌曲中的其中一首：\n{ s }")
-
 
 query_score = on_command('分数线')
 
