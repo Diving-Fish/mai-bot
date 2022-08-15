@@ -1,6 +1,7 @@
 import random
 import re
 
+from collections import defaultdict
 from PIL import Image
 from nonebot import on_command, on_message, on_notice, require, get_driver, on_regex
 from nonebot.typing import T_State
