@@ -101,7 +101,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         await spec_rand.finish("随机命令错误，请检查语法")
 
 
-mr = on_regex(r".*什么")
+mr = on_regex(r".*maimai.*什么")
 
 
 @mr.handle()
