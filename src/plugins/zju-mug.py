@@ -10,6 +10,7 @@ from nonebot.exception import IgnoredException
 from nonebot.message import event_preprocessor
 from src.libraries.image import *
 from random import randint
+import time
 
 bot_choice_pool = {}
 
