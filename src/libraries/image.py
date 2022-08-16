@@ -28,16 +28,20 @@ def text_to_image(text):
     margin = 4
     text_list = text.split('\n')
     max_width = 0
+    max_h = 0
     for text in text_list:
         w, h = font.getsize(text)
         max_width = max(max_width, w)
+        max_h = max(max_h, h)
     wa = max_width + padding * 2
+    print('max {} h{}'.format(max_h, h))
+    h = max_h
     ha = h * len(text_list) + margin * (len(text_list) - 1) + padding * 2
     i = Image.new('RGB', (wa, ha), color=(255, 255, 255))
     draw = ImageDraw.Draw(i)
     for j in range(len(text_list)):
         text = text_list[j]
-        draw.text((padding, padding + j * (margin + h)), text, font=font, fill=(0, 0, 0))
+        draw.text((padding, padding + j * (margin + max_h)), text, font=font, fill=(0, 0, 0))
     return i
 
 

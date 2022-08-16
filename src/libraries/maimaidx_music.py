@@ -119,16 +119,19 @@ class MusicList(List[Music]):
         return random.choice(self)
 
     def filter(self,
-               *,
-               level: Optional[Union[str, List[str]]] = ...,
-               ds: Optional[Union[float, List[float], Tuple[float, float]]] = ...,
-               title_search: Optional[str] = ...,
-               genre: Optional[Union[str, List[str]]] = ...,
-               bpm: Optional[Union[float, List[float], Tuple[float, float]]] = ...,
-               type: Optional[Union[str, List[str]]] = ...,
-               diff: List[int] = ...,
-               ):
+            *,
+            level: Optional[Union[str, List[str]]] = ...,
+            ds: Optional[Union[float, List[float], Tuple[float, float]]] = ...,
+            title_search: Optional[str] = ...,
+            charter_search: Optional[str] = ...,
+            composer_search: Optional[str] = ...,
+            genre: Optional[Union[str, List[str]]] = ...,
+            bpm: Optional[Union[float, List[float], Tuple[float, float]]] = ...,
+            type: Optional[Union[str, List[str]]] = ...,
+            diff: List[int] = ...,
+            ):
         new_list = MusicList()
+        chart_list = []
         for music in self:
             diff2 = diff
             music = deepcopy(music)
@@ -146,8 +149,22 @@ class MusicList(List[Music]):
                 continue
             if title_search is not Ellipsis and title_search.lower() not in music.title.lower():
                 continue
-            music.diff = diff2
-            new_list.append(music)
+            #if charter_search is not Ellipsis and charter_search.lower() not in music.charts.charter.lower():
+            #    continue
+            if composer_search is not Ellipsis and composer_search.lower() not in music.artist.lower():
+                continue
+            if charter_search is not Ellipsis:
+                for chart_id in range(len(music.charts)):
+                    if charter_search.lower() not in music.charts[chart_id].charter.lower():
+                        continue
+                    tmp = [music,chart_id]
+                    chart_list.append(tmp)
+                    #print(music.title)
+            else:
+                music.diff = diff2
+                new_list.append(music)
+        if charter_search is not Ellipsis:
+            return chart_list
         return new_list
 
 

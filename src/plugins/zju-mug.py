@@ -139,7 +139,6 @@ async def _(bot: Bot, event: Event, state: T_State):
 
 repeat = on_message(priority=99)
 
-
 @repeat.handle()
 async def _(bot: Bot, event: Event, state: T_State):
     r = random.random()

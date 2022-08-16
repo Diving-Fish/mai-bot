@@ -4,6 +4,7 @@ from nonebot import on_command, on_regex
 from nonebot.typing import T_State
 from nonebot.adapters import Event, Bot
 from nonebot.adapters.cqhttp import Message
+from nonebot.adapters.cqhttp import MessageSegment
 
 from src.libraries.tool import hash
 from src.libraries.maimaidx_music import *
@@ -347,3 +348,63 @@ async def _(bot: Bot, event: Event, state: T_State):
                 }
             }
         ]))
+
+
+composer_search_music = on_regex(r"^曲师查歌.+")
+
+@composer_search_music.handle()
+async def _(bot: Bot, event: Event, state: T_State):
+    regex = "曲师查歌(.+)"
+    composer_name = re.match(regex, str(event.get_message())).groups()[0].strip()
+    if composer_name == "":
+        return
+    res = total_list.filter(composer_search=composer_name)
+    ret = ''
+    flag = False
+    new_line = '\n'
+    for music in res:
+        ret = ret + f"{new_line if flag else ''}{music['id']}. {music['title']}"
+        flag = True
+    await composer_search_music.finish(Message([
+        MessageSegment.reply(event.message_id), {
+        "type": "image",
+        "data": {
+            "file": f"base64://{str(image_to_base64(text_to_image(ret)), encoding='utf-8')}"
+        }
+    }]))
+
+charter_search_music = on_regex(r"^谱师查歌.+")
+
+@charter_search_music.handle()
+async def _(bot: Bot, event: Event, state: T_State):
+    regex = "谱师查歌(.+)"
+    charter_name = re.match(regex, str(event.get_message())).groups()[0].strip()
+    if charter_name == "":
+        return
+    res = total_list.filter(charter_search=charter_name)
+    level_name = ['Basic', 'Advanced', 'Expert', 'Master', 'Re: MASTER']
+    ret_text = ""
+    mycnt = 0
+    flag = False
+    new_line = '\n'
+    for music_chartid in res:
+        ret_text += f"{new_line if flag else ''}{music_chartid[0]['id']}. {music_chartid[0]['title']} [{level_name[music_chartid[1]]}] {music_chartid[0]['charts'][music_chartid[1]].charter}"
+        flag = True
+        '''mycnt += 1
+        if mycnt>=50:
+            await charter_search_music.send(Message([
+                {"type": "text",
+                    "data": {
+                        "text": ret_text
+                    }} ]))
+            mycnt = 0
+            ret_text = ""'''
+    if(len(ret_text)==0):
+        await charter_search_music.finish("未找到该谱师")
+    await charter_search_music.finish(Message([
+        MessageSegment.reply(event.message_id), {
+        "type": "image",
+        "data": {
+            "file": f"base64://{str(image_to_base64(text_to_image(ret_text)), encoding='utf-8')}"
+        }
+    }]))
