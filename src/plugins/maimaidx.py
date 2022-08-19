@@ -127,10 +127,13 @@ async def _(bot: Bot, event: Event, state: T_State):
         for music in sorted(res, key = lambda i: int(i['id'])):
             search_result += f"{music['id']}. {music['title']}\n"
         await search_music.finish(Message([
-            {"type": "text",
+            MessageSegment.reply(event.message_id), 
+            {
+                "type": "text",
                 "data": {
                     "text": search_result.strip()
-                }}]))
+                }
+        }]))
     else:
         await search_music.send(f"结果过多（{len(res)} 条），请缩小查询范围。")
 
@@ -169,7 +172,7 @@ TOUCH: {chart['notes'][3]}
 BREAK: {chart['notes'][4]}
 谱师: {chart['charter']}'''
             await query_chart.send(Message([
-                {
+                MessageSegment.reply(event.message_id), {
                     "type": "text",
                     "data": {
                         "text": f"{music['id']}. {music['title']}\n"
@@ -196,7 +199,7 @@ BREAK: {chart['notes'][4]}
         try:
             file =f"https://www.diving-fish.com/covers/{get_cover_len4_id(music['id'])}.png"
             await query_chart.send(Message([
-                {
+                MessageSegment.reply(event.message_id), {
                     "type": "text",
                     "data": {
                         "text": f"{music['id']}. {music['title']}\n"
@@ -243,7 +246,7 @@ async def _(bot: Bot, event: Event, state: T_State):
     s += "千雪提醒您：打机时不要大力拍打或滑动哦\n今日推荐歌曲："
     music = total_list[h % len(total_list)]
     await jrwm.finish(Message([
-        {"type": "text", "data": {"text": s}}
+        MessageSegment.reply(event.message_id), {"type": "text", "data": {"text": s}}
     ] + song_txt(music)))
 
 query_score = on_command('分数线')
@@ -265,7 +268,7 @@ HOLD\t2/5/10
 SLIDE\t3/7.5/15
 TOUCH\t1/2.5/5
 BREAK\t5/12.5/25(外加200落)'''
-        await query_score.send(Message([{
+        await query_score.send(Message([MessageSegment.reply(event.message_id), {
             "type": "image",
             "data": {
                 "file": f"base64://{str(image_to_base64(text_to_image(s)), encoding='utf-8')}"
@@ -316,7 +319,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         await best_40_pic.send("该用户禁止了其他人获取数据。")
     else:
         await best_40_pic.send(Message([
-            {
+            MessageSegment.reply(event.message_id), {
                 "type": "image",
                 "data": {
                     "file": f"base64://{str(image_to_base64(img), encoding='utf-8')}"
@@ -341,7 +344,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         await best_50_pic.send("该用户禁止了其他人获取数据。")
     else:
         await best_50_pic.send(Message([
-            {
+            MessageSegment.reply(event.message_id), {
                 "type": "image",
                 "data": {
                     "file": f"base64://{str(image_to_base64(img), encoding='utf-8')}"

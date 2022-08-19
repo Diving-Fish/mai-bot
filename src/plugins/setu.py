@@ -28,35 +28,31 @@ def setu():
     return 
 
 
-async def setu_generate(payload : Dict) -> (Optional[Image.Image], int):
+async def setu_generate(payload : Dict) -> (Optional[Image.Image], list, int):
     try:
         async with aiohttp.request("POST", "https://api.lolicon.app/setu/v2", json=payload) as resp:
             if resp.status == 400:
-                return None, 400
+                return None, None, 400
             if resp.status == 403:
-                return None, 403
+                return None, None, 403
             obj = await resp.json()
             # print(obj)
             if 'data' not in obj or 'urls' not in obj['data'][0] or 'original' not in obj['data'][0]['urls']:
-                return None, None
+                return None, None, None
             else:
                 pic_url = obj['data'][0]['urls']['original']
                 resp = req.get(pic_url)
                 image = Image.open(BytesIO(resp.content))
                 Image_copy = Image.Image.copy(image)
                 image.close()
-                # size = Image_copy.size
-                # new_size = [size[0], size[1]]
-                # while new_size[0] > 1200 or new_size[1] > 1600 :
-                #     new_size[0] = new_size[0] // 2
-                #     new_size[1] = new_size[1] // 2
-                # Image_copy = Image_copy.resize(new_size)
                 Image_copy = Image_copy.convert("RGBA")
-                # Image_copy.save('a.PNG')
-                return Image_copy, 0
-            return None, None
+                if 'tags' not in obj['data'][0]:
+                    return Image_copy, None, 0
+                else:
+                    return Image_copy, obj['data'][0]['tags'], 0
+            return None, None, None
     except Exception as e:
-        return None, None
+        return None, None, None
 
 
 require_setu = on_regex(r"来张.*色图")
@@ -68,7 +64,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         payload = {'tag' : tag}
     else:
         payload = {}
-    img, flag = await setu_generate(payload)
+    img, tags, flag = await setu_generate(payload)
     print(img, flag)
     if flag != 0:
         # await require_setu.finish('寄！')
@@ -80,25 +76,36 @@ async def _(bot: Bot, event: Event, state: T_State):
                 }
         }]))
     else:
-        # await require_setu.finish(Message([
+        # await require_setu.send(Message([
         #     MessageSegment.reply(event.message_id), {
-        #         "type": "text",
+        #         "type": "image",
         #         "data": {
-        #             "text": f"寄！"
+        #             "file": f"base64://{str(image_to_base64(img), encoding='utf-8')}"
         #         }
-        # }]))
+        #     }
+        # ]))        
+        
         await require_setu.send(Message([
-            MessageSegment.reply(event.message_id), {
+            MessageSegment.reply(event.message_id),
+            {
                 "type": "image",
                 "data": {
                     "file": f"base64://{str(image_to_base64(img), encoding='utf-8')}"
                 }
-        }]))
+            },
+            {
+                "type": "text",
+                "data": {
+                    "text": f"TAGS : {tags}"
+                }
+            }
+        ]))        
+
         # await require_setu.send(Message([
-        #     {
+        #     MessageSegment.reply(event.message_id), {
         #         "type": "image",
         #         "data": {
-        #             "file": f"{image_url}"
+        #             "file": f"base64://{str(image_to_base64(img), encoding='utf-8')}"
         #         }
         #     }
-        # ]))
+        # ]))        
