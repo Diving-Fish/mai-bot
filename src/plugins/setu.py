@@ -24,6 +24,9 @@ import requests as req
 from PIL import Image
 from io import BytesIO
 
+# comments to let it go
+comments to let module works
+
 def setu():
     return 
 
@@ -56,6 +59,7 @@ async def setu_generate(payload : Dict) -> (Optional[Image.Image], list, int):
 
 
 require_setu = on_regex(r"来张.*色图")
+
 @require_setu.handle()
 async def _(bot: Bot, event: Event, state: T_State):
     string = str(event.get_message())
@@ -72,7 +76,7 @@ async def _(bot: Bot, event: Event, state: T_State):
             MessageSegment.reply(event.message_id), {
                 "type": "text",
                 "data": {
-                    "text": f"寄！"
+                    "text": f"没有这样的色图喵"
                 }
         }]))
     else:
@@ -85,18 +89,12 @@ async def _(bot: Bot, event: Event, state: T_State):
         #     }
         # ]))        
         
-        await require_setu.send(Message([
+        await require_setu.finish(Message([
             MessageSegment.reply(event.message_id),
             {
                 "type": "image",
                 "data": {
                     "file": f"base64://{str(image_to_base64(img), encoding='utf-8')}"
-                }
-            },
-            {
-                "type": "text",
-                "data": {
-                    "text": f"TAGS : {tags}"
                 }
             }
         ]))        

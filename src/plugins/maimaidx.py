@@ -13,9 +13,31 @@ from src.libraries.maimai_best_40 import generate
 from src.libraries.maimai_best_50 import generate50
 import re
 
-
 def song_txt(music: Music):
     return Message([
+        {
+            "type": "text",
+            "data": {
+                "text": f"{music.id}. {music.title}\n"
+            }
+        },
+        {
+            "type": "image",
+            "data": {
+                "file": f"https://www.diving-fish.com/covers/{get_cover_len4_id(music.id)}.png"
+            }
+        },
+        {
+            "type": "text",
+            "data": {
+                "text": f"\n{'/'.join(music.level)}"
+            }
+        }
+    ])
+
+def song_txt_with_reply(music: Music, message_id):
+    return Message([
+        MessageSegment.reply(event.message_id),
         {
             "type": "text",
             "data": {
@@ -107,7 +129,7 @@ mr = on_regex(r".*maimai.*什么")
 
 @mr.handle()
 async def _(bot: Bot, event: Event, state: T_State):
-    await mr.finish(song_txt(total_list.random()))
+    await mr.finish(song_txt_with_reply(total_list.random(), event.message_id))
 
 
 search_music = on_regex(r"^查歌.+")
@@ -295,11 +317,11 @@ BREAK\t5/12.5/25(外加200落)'''
             reduce = 101 - line
             if reduce <= 0 or reduce >= 101:
                 raise ValueError
-            await query_chart.send(f'''{music['title']} {level_labels2[level_index]}
+            await query_score.send(f'''{music['title']} {level_labels2[level_index]}
 分数线 {line}% 允许的最多 TAP GREAT 数量为 {(total_score * reduce / 10000):.2f}(每个-{10000 / total_score:.4f}%),
 BREAK 50落(一共{brk}个)等价于 {(break_50_reduce / 100):.3f} 个 TAP GREAT(-{break_50_reduce / total_score * 100:.4f}%)''')
         except Exception:
-            await query_chart.send("格式错误，输入“分数线 帮助”以查看帮助信息")
+            await query_score.send("格式错误，输入“分数线 帮助”以查看帮助信息")
 
 
 best_40_pic = on_command('b40')
@@ -344,7 +366,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         await best_50_pic.send("该用户禁止了其他人获取数据。")
     else:
         await best_50_pic.send(Message([
-            MessageSegment.reply(event.message_id), {
+            {
                 "type": "image",
                 "data": {
                     "file": f"base64://{str(image_to_base64(img), encoding='utf-8')}"
@@ -405,9 +427,10 @@ async def _(bot: Bot, event: Event, state: T_State):
     if(len(ret_text)==0):
         await charter_search_music.finish("未找到该谱师")
     await charter_search_music.finish(Message([
-        MessageSegment.reply(event.message_id), {
-        "type": "image",
-        "data": {
-            "file": f"base64://{str(image_to_base64(text_to_image(ret_text)), encoding='utf-8')}"
+        {
+            "type": "image",
+            "data": {
+                "file": f"base64://{str(image_to_base64(text_to_image(ret_text)), encoding='utf-8')}"
+            }
         }
-    }]))
+    ]))

@@ -4,3 +4,4 @@ src/static
 a.txt
 venv
 __pycache__
+bot.log
