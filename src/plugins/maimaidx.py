@@ -10,6 +10,7 @@ from src.libraries.tool import hash
 from src.libraries.maimaidx_music import *
 from src.libraries.image import *
 from src.libraries.maimai_best_40 import generate
+from src.libraries.maimai_best_40z import generate as generatez
 from src.libraries.maimai_best_50 import generate50
 import re
 
@@ -297,31 +298,38 @@ BREAK\t5/12.5/25(外加200落)'''
             }
         }]))
     elif len(argv) == 2:
-        try:
-            grp = re.match(r, argv[0]).groups()
-            level_labels = ['绿', '黄', '红', '紫', '白']
-            level_labels2 = ['Basic', 'Advanced', 'Expert', 'Master', 'Re:MASTER']
-            level_index = level_labels.index(grp[0])
-            chart_id = grp[2]
-            line = float(argv[1])
-            music = total_list.by_id(chart_id)
-            chart: Dict[Any] = music['charts'][level_index]
-            tap = int(chart['notes'][0])
-            slide = int(chart['notes'][2])
-            hold = int(chart['notes'][1])
-            touch = int(chart['notes'][3]) if len(chart['notes']) == 5 else 0
-            brk = int(chart['notes'][-1])
-            total_score = 500 * tap + slide * 1500 + hold * 1000 + touch * 500 + brk * 2500
-            break_bonus = 0.01 / brk
-            break_50_reduce = total_score * break_bonus / 4
-            reduce = 101 - line
-            if reduce <= 0 or reduce >= 101:
-                raise ValueError
-            await query_score.send(f'''{music['title']} {level_labels2[level_index]}
-分数线 {line}% 允许的最多 TAP GREAT 数量为 {(total_score * reduce / 10000):.2f}(每个-{10000 / total_score:.4f}%),
-BREAK 50落(一共{brk}个)等价于 {(break_50_reduce / 100):.3f} 个 TAP GREAT(-{break_50_reduce / total_score * 100:.4f}%)''')
-        except Exception:
-            await query_score.send("格式错误，输入“分数线 帮助”以查看帮助信息")
+        # try:
+        grp = re.match(r, argv[0]).groups()
+        level_labels = ['绿', '黄', '红', '紫', '白']
+        level_labels2 = ['Basic', 'Advanced', 'Expert', 'Master', 'Re:MASTER']
+        level_index = level_labels.index(grp[0])
+        chart_id = grp[2]
+        line = float(argv[1])
+        music = total_list.by_id(chart_id)
+        chart: Dict[Any] = music['charts'][level_index]
+        tap = int(chart['notes'][0])
+        slide = int(chart['notes'][2])
+        hold = int(chart['notes'][1])
+        touch = int(chart['notes'][3]) if len(chart['notes']) == 5 else 0
+        brk = int(chart['notes'][-1])
+        total_score = 500 * tap + slide * 1500 + hold * 1000 + touch * 500 + brk * 2500
+        break_bonus = 0.01 / brk
+        break_50_reduce = total_score * break_bonus / 4
+        reduce = 101 - line
+        if reduce <= 0 or reduce >= 101:
+            raise ValueError
+        information = str(f"{music['title']} {level_labels2[level_index]} 分数线 {line}% 允许的最多 TAP GREAT 数量为 {(total_score * reduce / 10000):.2f}(每个-{10000 / total_score:.4f}%), BREAK 50落(一共{brk}个)等价于 {(break_50_reduce / 100):.3f} 个 TAP GREAT(-{break_50_reduce / total_score * 100:.4f}%)")
+        print(information)
+        await query_score.finish(Message([
+            MessageSegment.reply(event.message_id), {
+                "type": "text",
+                "data": {
+                    "text": information
+                }
+            }
+        ]))
+        # except Exception:
+        #     await query_score.send("格式错误，输入“分数线 帮助”以查看帮助信息")
 
 
 best_40_pic = on_command('b40')
@@ -348,6 +356,33 @@ async def _(bot: Bot, event: Event, state: T_State):
                 }
             }
         ]))
+
+
+best_40_picz = on_command('b40z')
+
+
+@best_40_picz.handle()
+async def _(bot: Bot, event: Event, state: T_State):
+    username = str(event.get_message()).strip()
+    if username == "":
+        payload = {'qq': str(event.get_user_id())}
+    else:
+        payload = {'username': username}
+    img, success = await generatez(payload)
+    if success == 400:
+        await best_40_picz.send("未找到此玩家，请确保此玩家的用户名和查分器中的用户名相同。")
+    elif success == 403:
+        await best_40_picz.send("该用户禁止了其他人获取数据。")
+    else:
+        await best_40_picz.send(Message([
+            MessageSegment.reply(event.message_id), {
+                "type": "image",
+                "data": {
+                    "file": f"base64://{str(image_to_base64(img), encoding='utf-8')}"
+                }
+            }
+        ]))
+
 
 best_50_pic = on_command('b50')
 

@@ -1,7 +1,4 @@
-src/static
 .idea
 .code
-a.txt
 venv
 __pycache__
-bot.log
