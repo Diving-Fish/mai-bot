@@ -1,5 +1,8 @@
 from nonebot import on_command, on_regex
+<<<<<<< HEAD
 
+=======
+>>>>>>> 3f67be3... [UPDATE] Support python 3.10 and onebot v11
 from nonebot.params import CommandArg, EventMessage
 from nonebot.adapters import Event
 from nonebot.adapters.onebot.v11 import Message, MessageSegment
@@ -35,6 +38,7 @@ def song_txt(music: Music):
         MessageSegment("text", {
             "text": f"\n{'/'.join(music.level)}"
         })
+<<<<<<< HEAD
     ])
 
 def song_txt_with_reply(music: Music, message_id):
@@ -49,6 +53,8 @@ def song_txt_with_reply(music: Music, message_id):
         MessageSegment("text", {
             "text": f"\n{'/'.join(music.level)}"
         })
+=======
+>>>>>>> 3f67be3... [UPDATE] Support python 3.10 and onebot v11
     ])
 
 
@@ -122,8 +128,13 @@ mr = on_regex(r".*maimai.*什么")
 
 
 @mr.handle()
+<<<<<<< HEAD
 async def _(event: Event):
     await mr.finish(song_txt_with_reply(total_list.random(), event.message_id))
+=======
+async def _():
+    await mr.finish(song_txt(total_list.random()))
+>>>>>>> 3f67be3... [UPDATE] Support python 3.10 and onebot v11
 
 
 search_music = on_regex(r"^查歌.+")
@@ -143,7 +154,10 @@ async def _(event: Event, message: Message = EventMessage()):
         for music in sorted(res, key = lambda i: int(i['id'])):
             search_result += f"{music['id']}. {music['title']}\n"
         await search_music.finish(Message([
+<<<<<<< HEAD
             MessageSegment.reply(event.message_id), 
+=======
+>>>>>>> 3f67be3... [UPDATE] Support python 3.10 and onebot v11
             MessageSegment("text", {
                 "text": search_result.strip()
             })]))
@@ -185,7 +199,10 @@ TOUCH: {chart['notes'][3]}
 BREAK: {chart['notes'][4]}
 谱师: {chart['charter']}'''
             await query_chart.send(Message([
+<<<<<<< HEAD
                 MessageSegment.reply(event.message_id),
+=======
+>>>>>>> 3f67be3... [UPDATE] Support python 3.10 and onebot v11
                 MessageSegment("text", {
                     "text": f"{music['id']}. {music['title']}\n"
                 }),
@@ -204,7 +221,10 @@ BREAK: {chart['notes'][4]}
         try:
             file = f"base64://{get_pic(music.id)}"
             await query_chart.send(Message([
+<<<<<<< HEAD
                 MessageSegment.reply(event.message_id),
+=======
+>>>>>>> 3f67be3... [UPDATE] Support python 3.10 and onebot v11
                 MessageSegment("text", {
                     "text": f"{music['id']}. {music['title']}\n"
                 }),
@@ -242,10 +262,14 @@ async def _(event: Event, message: Message = CommandArg()):
             s += f'忌 {wm_list[i]}\n'
     s += "千雪提醒您：打机时不要大力拍打或滑动哦\n今日推荐歌曲："
     music = total_list[h % len(total_list)]
+<<<<<<< HEAD
     await jrwm.finish(Message([
         MessageSegment.reply(event.message_id), 
         MessageSegment("text", {"text": s})] + song_txt(music)
         ))
+=======
+    await jrwm.finish(Message([MessageSegment("text", {"text": s})] + song_txt(music)))
+>>>>>>> 3f67be3... [UPDATE] Support python 3.10 and onebot v11
 
 query_score = on_command('分数线')
 
@@ -267,7 +291,10 @@ SLIDE\t3/7.5/15
 TOUCH\t1/2.5/5
 BREAK\t5/12.5/25(外加200落)'''
         await query_score.send(Message([
+<<<<<<< HEAD
             MessageSegment.reply(event.message_id),
+=======
+>>>>>>> 3f67be3... [UPDATE] Support python 3.10 and onebot v11
             MessageSegment("image", {
                 "file": f"base64://{str(image_to_base64(text_to_image(s)), encoding='utf-8')}"
             })
@@ -360,6 +387,7 @@ async def _(event: Event, message: Message = CommandArg()):
         await best_50_pic.send("该用户禁止了其他人获取数据。")
     else:
         await best_50_pic.send(Message([
+<<<<<<< HEAD
             {
                 "type": "image",
                 "data": {
@@ -428,3 +456,9 @@ async def _(event: Event):
             }
         }
     ]))
+=======
+            MessageSegment("image", {
+                "file": f"base64://{str(image_to_base64(img), encoding='utf-8')}"
+            })
+        ]))
+>>>>>>> 3f67be3... [UPDATE] Support python 3.10 and onebot v11
