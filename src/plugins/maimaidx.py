@@ -1,5 +1,4 @@
 from nonebot import on_command, on_regex
-
 from nonebot.params import CommandArg, EventMessage
 from nonebot.adapters import Event
 from nonebot.adapters.onebot.v11 import Message, MessageSegment
