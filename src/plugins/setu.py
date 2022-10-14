@@ -25,7 +25,7 @@ from PIL import Image
 from io import BytesIO
 
 # comments to let it go
-comments to let module works
+# comments to let module works
 
 def setu():
     return 
@@ -58,13 +58,13 @@ async def setu_generate(payload : Dict) -> (Optional[Image.Image], list, int):
         return None, None, None
 
 
-require_setu = on_regex(r"来张.*色图")
+require_setu = on_regex(r"求求你了来张.*色图")
 
 @require_setu.handle()
 async def _(bot: Bot, event: Event, state: T_State):
     string = str(event.get_message())
-    if len(string) > 4:
-        tag = string[2:-2]
+    if len(string) > 8:
+        tag = string[6:-2]
         payload = {'tag' : tag}
     else:
         payload = {}
@@ -90,7 +90,6 @@ async def _(bot: Bot, event: Event, state: T_State):
         # ]))        
         
         await require_setu.finish(Message([
-            MessageSegment.reply(event.message_id),
             {
                 "type": "image",
                 "data": {

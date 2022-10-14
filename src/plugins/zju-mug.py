@@ -13,6 +13,7 @@ from nonebot.message import event_preprocessor
 from src.libraries.image import *
 from random import randint
 import time
+import csv
 
 bot_choice_pool = {}
 
@@ -137,6 +138,47 @@ async def _(bot: Bot, event: Event, state: T_State):
                 "text": f"{x}"
             }
         }]))
+
+
+aliases_map = None
+aliases_version = None
+
+def query_aliases_name(str):
+    if str in aliases_map.keys():
+        return aliases_map[str]
+    else:
+        return '不知道喵'
+
+def init_aliases_chart():
+    global aliases_map
+    if aliases_map is None:
+        aliases_map = {}
+        with open('src/static/main.csv')  as csvfile:
+            spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
+            for row in spamreader:
+                if row[0].isdigit():
+                    true_name = row[1]
+                    true_id = row[0]
+                    for idx in range(0, len(row)):
+                        aliases_map [row[idx]] = (true_id, true_name)
+
+
+random_choice = on_regex("(.+)是什么歌", priority=50)
+
+
+@random_choice.handle()
+async def _(bot: Bot, event: Event, state: T_State):
+    pid = event.group_id if event.message_type == 'group' else event.get_user_id()
+    init_aliases_chart()
+    alias_name = query_aliases_name(str(event.get_message())[:-4])
+    await random_choice.finish(Message([
+        MessageSegment.reply(event.message_id), {
+            "type": "text",
+            "data": {
+                "text": f"{alias_name}"
+            }
+        }]))
+
 
 repeat = on_message(priority=99)
 
