@@ -188,13 +188,6 @@ async def _(bot: Bot, event: Event, state: T_State):
     date_d = int(time.strftime("%d", time.localtime(time.time())))
     date_m = int(time.strftime("%m", time.localtime(time.time())))
     date_y = int(time.strftime("%Y", time.localtime(time.time())))
-    in_exam_week = bool(date_d >= 3 and date_d <=
-                        12 and date_m == 1 and date_y == 2022 and event.group_id == 206395805)
+    
     if r <= 0.0114514:
-        if in_exam_week == True:
-            if int(time.strftime("%H", time.localtime(time.time()))) > 20:
-                await repeat.finish("还有考试的同学该睡觉啦")
-            else:
-                await repeat.finish("还有考试的同学该复习啦")
-        else:
-            await repeat.finish(event.get_message())
+        await repeat.finish(event.get_message())
