@@ -18,11 +18,11 @@ import csv
 maimai_spot_person_number = {}
 
 
-person_record = on_regex("[西良悦奥]([0-9]+)")
+person_record = on_regex("[七西良悦奥]([0-9]+)")
 
 @person_record.handle()
 async def _(bot: Bot, event: Event, state: T_State):
-    regex = "([西良悦奥])([0-9]+)"
+    regex = "([七西良悦奥])([0-9]+)"
     groups = re.match(regex, str(event.get_message())).groups()
     if len(groups[1]) < 3:
         tempTime = time.localtime(time.time())
@@ -53,11 +53,11 @@ async def _(bot: Bot, event: Event, state: T_State):
     ]))
 
 
-person_query = on_regex("[西良悦奥]几")
+person_query = on_regex("[七西良悦奥]几")
 
 @person_query.handle()
 async def _(bot: Bot, event: Event, state: T_State):
-    regex = "([西良悦奥])几"
+    regex = "([七西良悦奥])几"
     groups = re.match(regex, str(event.get_message())).groups()
     
     tempString = ""

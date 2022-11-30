@@ -131,6 +131,7 @@ class DrawBest(object):
         for i in range(4):
             self.COLOUMS_IMG.append(2 + 258 * i)
         self.draw()
+        self.img = self.img.convert("L")
 
     def _Q2B(self, uchar):
         """单个字符 全角转半角"""

@@ -90,6 +90,7 @@ async def _(bot: Bot, event: Event, state: T_State):
     s = ""
     for elem in result_set:
         s += f"{elem[0]}. {elem[1]} {elem[3]} {elem[4]}({elem[2]})\n"
+        # ID Name Exp/Mas/Adv 10+ 10.9
     await inner_level.finish(s.strip())
 
 
