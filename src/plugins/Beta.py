@@ -10,6 +10,7 @@ from nonebot.adapters.cqhttp import Message, Event, Bot
 from nonebot.adapters.cqhttp import MessageSegment
 from nonebot.exception import IgnoredException
 from nonebot.message import event_preprocessor
+from src.libraries.maimaidx_music import total_list
 from src.libraries.image import *
 from random import randint
 import time
@@ -104,8 +105,8 @@ class DrawQuery(object):
     def __init__(
         self,
         result_set,
-        cover_dir='./src/static/mai/cover/',
-        font_dir='./src/static/'
+        cover_dir='src/static/mai/cover/',
+        font_dir='src/static/'
     ):
         self.height_title = 50
         self.width_lv = 80
@@ -130,6 +131,7 @@ class DrawQuery(object):
         self.cover_dir = cover_dir
         self.font_dir = font_dir
         self.draw()
+        self.img = self._resizePic(self.img, 1.0)
 
     def _resizePic(self, img: Image.Image, time: float):
         return img.resize((int(img.size[0] * time), int(img.size[1] * time)))
@@ -143,10 +145,22 @@ class DrawQuery(object):
                 self.cover_dir, f'{idNum}.jpg')
         if not os.path.exists(pngPath):
             pngPath = os.path.join(
+                self.cover_dir, f'{idNum.rjust(4, "0")}.jpg')
+        if not os.path.exists(pngPath):
+            pngPath = os.path.join(
+                self.cover_dir, f'{idNum.rjust(4, "0")}.png')
+        if not os.path.exists(pngPath):
+            pngPath = os.path.join(
                 self.cover_dir, f'{int(idNum)-10000}.jpg')
         if not os.path.exists(pngPath):
             pngPath = os.path.join(
                 self.cover_dir, f'{int(idNum)-10000}.png')
+        if not os.path.exists(pngPath):
+            pngPath = os.path.join(
+                self.cover_dir, f'{str(int(idNum)-10000).rjust(4, "0")}.png')
+        if not os.path.exists(pngPath):
+            pngPath = os.path.join(
+                self.cover_dir, f'{str(int(idNum)-10000).rjust(4, "0")}.jpg')
         if not os.path.exists(pngPath):
             pngPath = os.path.join(self.cover_dir, '1000.png')
             
@@ -157,9 +171,9 @@ class DrawQuery(object):
     def draw(self):
 
         font1 = ImageFont.truetype(
-            self.font_dir+'Hos.ttf', 28, encoding='unic')
+            os.path.join(self.font_dir, 'HOS.ttf'), 28, encoding='unic')
         font1_small = ImageFont.truetype(
-            self.font_dir+'Hos.ttf', 25, encoding='unic')
+            os.path.join(self.font_dir, 'HOS.ttf'), 25, encoding='unic')
         titlePlateDraw = ImageDraw.Draw(self.img)
         titlePlateDraw.text(
             ((self.width_calc - 200) // 2, 40), f'定数表 {self.start} - {self.end}', 'black', font1)
@@ -208,7 +222,7 @@ class DrawQuery(object):
         return self.img
 
 
-def level_picture_test(ds1=8.0, ds2=14.6):
+async def level_picture_test(ds1=8.0, ds2=14.6):
 
     def cross(checker: List[Any], elem: Optional[Union[Any, List[Any]]], diff):
         ret = False
@@ -364,18 +378,6 @@ def level_picture_test(ds1=8.0, ds2=14.6):
                 return chart_list
             return new_list
 
-    import json
-    obj = None
-    with open('total_list', "r") as f:
-        obj = json.load(f)
-    obj
-
-    total_list: MusicList = MusicList(obj)
-    for __i in range(len(total_list)):
-        total_list[__i] = Music(total_list[__i])
-        for __j in range(len(total_list[__i].charts)):
-            total_list[__i].charts[__j] = Chart(total_list[__i].charts[__j])
-
     result_set = []
     diff_label = ['Bas', 'Adv', 'Exp', 'Mst', 'ReM']
 
@@ -421,7 +423,7 @@ async def _(bot: Bot, event: Event, state: T_State):
 
     if result_pic is not None:
 
-        await level_table.send(Message([
+        await level_table.finish(Message([
             {
                 "type": "image",
                 "data": {
@@ -431,4 +433,4 @@ async def _(bot: Bot, event: Event, state: T_State):
         ]))
     else:
         
-        await level_table.send("寄了喵")
+        await level_table.finish("寄了喵")
