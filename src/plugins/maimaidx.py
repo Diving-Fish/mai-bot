@@ -317,13 +317,13 @@ BREAK\t5/12.5/25(外加200落)'''
         reduce = 101 - line
         if reduce <= 0 or reduce >= 101:
             raise ValueError
-        information = str(f"{music['title']} {level_labels2[level_index]} 分数线 {line}% 允许的最多 TAP GREAT 数量为 {(total_score * reduce / 10000):.2f}(每个-{10000 / total_score:.4f}%), BREAK 50落(一共{brk}个)等价于 {(break_50_reduce / 100):.3f} 个 TAP GREAT(-{break_50_reduce / total_score * 100:.4f}%)")
+        information = str(f"{music['title']} {level_labels2[level_index]} 分数线 {line}% \n 允许的最多 TAP GREAT 数量为 {(total_score * reduce / 10000):.2f}(每个-{10000 / total_score:.4f}%),\nBREAK 50落(一共{brk}个)等价于 {(break_50_reduce / 100):.3f} 个 TAP GREAT(-{break_50_reduce / total_score * 100:.4f}%)")
         print(information)
         await query_score.finish(Message([
-            MessageSegment.reply(event.message_id), {
-                "type": "text",
+            {
+                "type": "image",
                 "data": {
-                    "text": information
+                    "file": f"base64://{str(image_to_base64(text_to_image(information)), encoding='utf-8')}"
                 }
             }
         ]))

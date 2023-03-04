@@ -7,6 +7,8 @@ import _thread
 import nonebot
 import requests
 
+comments to let it go
+
 scheduler = require('nonebot_plugin_apscheduler').scheduler
 
 on_live_set = set()
@@ -60,8 +62,8 @@ async def demo():
 
 
     id_zyh = "3216480"
-    id_hjh_npy = "26760398"
+    # id_hjh_npy = "26760398"
     id_dys = "7777"
     await check_info(id_zyh)
-    await check_info(id_hjh_npy)
+    # await check_info(id_hjh_npy)
     await check_info(id_dys)
