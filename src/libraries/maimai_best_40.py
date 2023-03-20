@@ -263,7 +263,7 @@ class DrawBest(object):
             num = '06'
         elif self.playerRating < (7000 if not self.b50 else 13000):
             num = '07'
-        elif self.playerRating < (8000 if not self.b50 else 14500):
+        elif self.playerRating < (8000 if not self.b50 else 14000):
             num = '08'
         elif self.playerRating < (8500 if not self.b50 else 15000):
             num = '09'
@@ -716,7 +716,7 @@ def computeRa(ds: float, achievement: float, spp: bool = False) -> int:
     elif achievement < 98:
         baseRa = 20.0 if spp else 12.5
     elif achievement < 99:
-        baseRa = 20.0 if spp else 12.7
+        baseRa = 20.3 if spp else 12.7
     elif achievement < 99.5:
         baseRa = 20.8 if spp else 13.0
     elif achievement < 100:

@@ -11,6 +11,20 @@ from src.libraries.maimaidx_music import *
 from src.libraries.image import *
 from src.libraries.maimai_best_40 import generate
 import re
+import os
+
+def get_pic(idNum):
+    cover_dir = 'src/static/mai/cover/'
+    pngPath = os.path.join(cover_dir, f'{int(idNum)}.png')
+    if not os.path.exists(pngPath):
+        pngPath = os.path.join(cover_dir, f'{int(idNum)}.jpg')
+    if not os.path.exists(pngPath):
+        pngPath = os.path.join(cover_dir, f'{int(idNum)-10000}.jpg')
+    if not os.path.exists(pngPath):
+        pngPath = os.path.join(cover_dir, f'{int(idNum)-10000}.png')
+    if not os.path.exists(pngPath):
+        pngPath = os.path.join(cover_dir, '1000.png')
+    return str(image_to_base64(Image.open(pngPath).convert('RGBA')), encoding='utf-8')
 
 def song_txt(music: Music):
     return Message([
@@ -23,7 +37,7 @@ def song_txt(music: Music):
         {
             "type": "image",
             "data": {
-                "file": f"https://www.diving-fish.com/covers/{get_cover_len4_id(music.id)}.png"
+                "file": f"base64://{get_pic(music.id)}"
             }
         },
         {
@@ -46,7 +60,7 @@ def song_txt_with_reply(music: Music, message_id):
         {
             "type": "image",
             "data": {
-                "file": f"https://www.diving-fish.com/covers/{get_cover_len4_id(music.id)}.png"
+                "file": f"base64://{get_pic(music.id)}"
             }
         },
         {
@@ -177,7 +191,7 @@ async def _(bot: Bot, event: Event, state: T_State):
             chart = music['charts'][level_index]
             ds = music['ds'][level_index]
             level = music['level'][level_index]
-            file = f"https://www.diving-fish.com/covers/{get_cover_len4_id(music['id'])}.png"
+            file = f"base64://{get_pic(music.id)}"
             if len(chart['notes']) == 4:
                 msg = f'''{level_name[level_index]} {level}({ds})
 TAP: {chart['notes'][0]}
@@ -219,7 +233,7 @@ BREAK: {chart['notes'][4]}
         name = groups[1]
         music = total_list.by_id(name)
         try:
-            file =f"https://www.diving-fish.com/covers/{get_cover_len4_id(music['id'])}.png"
+            file =f"base64://{get_pic(music.id)}"
             await query_chart.send(Message([
                 MessageSegment.reply(event.message_id), {
                     "type": "text",
