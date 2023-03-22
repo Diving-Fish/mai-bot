@@ -2,3 +2,4 @@
 .code
 venv
 __pycache__
+src/static/
