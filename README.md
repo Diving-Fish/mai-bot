@@ -62,7 +62,7 @@ message:
   
 servers:
   - ws-reverse:
-      universal: ws://127.0.0.1:10219/cqhttp/ws
+      universal: ws://127.0.0.1:10219/onebot/v11/ws
 ```
 然后设置您的 QQ 号和密码。您也可以不设置密码，选择扫码登陆的方式。
 

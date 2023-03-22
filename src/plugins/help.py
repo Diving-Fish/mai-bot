@@ -1,14 +1,9 @@
-import random
-import re
-
-from PIL import Image
-from nonebot import on_command, on_message, on_notice, require, get_driver, on_regex
+from nonebot import on_command, on_notice
 from nonebot.typing import T_State
-from nonebot.adapters.cqhttp import Message, Event, Bot
+from nonebot.adapters.onebot.v11 import Message, Event, Bot, MessageSegment
 from nonebot.exception import IgnoredException
 from nonebot.message import event_preprocessor
 from src.libraries.image import *
-from random import randint
 
 
 @event_preprocessor
@@ -48,15 +43,16 @@ DLC:
 XXXXXXXX 发送一张pixiv涩图
 
 '''
-    await help.send(Message([{
-        "type": "image",
-        "data": {
-            "file": f"base64://{str(image_to_base64(text_to_image(help_str)), encoding='utf-8')}"
-        }
-    }]))
+    await help.send(Message([
+        MessageSegment("image",{
+                "file": f"base64://{str(image_to_base64(text_to_image(help_str)), encoding='utf-8')}"
+        })
+    ]))
+        
 
 
-async def _group_poke(bot: Bot, event: Event, state: dict) -> bool:
+
+async def _group_poke(bot: Bot, event: Event) -> bool:
     value = (event.notice_type == "notify" and event.sub_type == "poke" and event.target_id == int(bot.self_id))
     return value
 
@@ -68,10 +64,9 @@ poke = on_notice(rule=_group_poke, priority=10, block=True)
 async def _(bot: Bot, event: Event, state: T_State):
     if event.__getattribute__('group_id') is None:
         event.__delattr__('group_id')
-    await poke.send(Message([{
-        "type": "poke",
-        "data": {
-            "qq": f"{event.sender_id}"
-        }
-    }]))
+    await poke.send(Message([
+        MessageSegment("poke",  {
+           "qq": f"{event.sender_id}"
+       })
+    ]))
 

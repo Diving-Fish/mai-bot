@@ -1,10 +1,8 @@
-from collections import defaultdict
-
 from nonebot import on_command, on_regex
-from nonebot.typing import T_State
-from nonebot.adapters import Event, Bot
-from nonebot.adapters.cqhttp import Message
-from nonebot.adapters.cqhttp import MessageSegment
+
+from nonebot.params import CommandArg, EventMessage
+from nonebot.adapters import Event
+from nonebot.adapters.onebot.v11 import Message, MessageSegment
 
 from src.libraries.tool import hash
 from src.libraries.maimaidx_music import *
@@ -28,47 +26,29 @@ def get_pic(idNum):
 
 def song_txt(music: Music):
     return Message([
-        {
-            "type": "text",
-            "data": {
-                "text": f"{music.id}. {music.title}\n"
-            }
-        },
-        {
-            "type": "image",
-            "data": {
-                "file": f"base64://{get_pic(music.id)}"
-            }
-        },
-        {
-            "type": "text",
-            "data": {
-                "text": f"\n{'/'.join(music.level)}"
-            }
-        }
+        MessageSegment("text", {
+            "text": f"{music.id}. {music.title}\n"
+        }),
+        MessageSegment("image", {
+            "file": f"https://www.diving-fish.com/covers/{get_cover_len4_id(music.id)}.png"
+        }),
+        MessageSegment("text", {
+            "text": f"\n{'/'.join(music.level)}"
+        })
     ])
 
 def song_txt_with_reply(music: Music, message_id):
     return Message([
-        MessageSegment.reply(event.message_id),
-        {
-            "type": "text",
-            "data": {
-                "text": f"{music.id}. {music.title}\n"
-            }
-        },
-        {
-            "type": "image",
-            "data": {
-                "file": f"base64://{get_pic(music.id)}"
-            }
-        },
-        {
-            "type": "text",
-            "data": {
-                "text": f"\n{'/'.join(music.level)}"
-            }
-        }
+        MessageSegment.reply(message_id),
+        MessageSegment("text", {
+            "text": f"{music.id}. {music.title}\n"
+        }),
+        MessageSegment("image", {
+            "file": f"base64://{get_pic(music.id)}"
+        }),
+        MessageSegment("text", {
+            "text": f"\n{'/'.join(music.level)}"
+        })
     ])
 
 
@@ -89,8 +69,8 @@ inner_level = on_command('inner_level ', aliases={'定数查歌 '})
 
 
 @inner_level.handle()
-async def _(bot: Bot, event: Event, state: T_State):
-    argv = str(event.get_message()).strip().split(" ")
+async def _(event: Event, message: Message = CommandArg()):
+    argv = str(message).strip().split(" ")
     if len(argv) > 2 or len(argv) == 0:
         await inner_level.finish("命令格式为\n定数查歌 <定数>\n定数查歌 <定数下限> <定数上限>")
         return
@@ -112,10 +92,10 @@ spec_rand = on_regex(r"^随个(?:dx|sd|标准)?[绿黄红紫白]?[0-9]+\+?")
 
 
 @spec_rand.handle()
-async def _(bot: Bot, event: Event, state: T_State):
+async def _(event: Event, message: Message = EventMessage()):
     level_labels = ['绿', '黄', '红', '紫', '白']
     regex = "随个((?:dx|sd|标准))?([绿黄红紫白]?)([0-9]+\+?)"
-    res = re.match(regex, str(event.get_message()).lower())
+    res = re.match(regex, str(message).lower())
     try:
         if res.groups()[0] == "dx":
             tp = ["DX"]
@@ -142,7 +122,7 @@ mr = on_regex(r".*maimai.*什么")
 
 
 @mr.handle()
-async def _(bot: Bot, event: Event, state: T_State):
+async def _(event: Event):
     await mr.finish(song_txt_with_reply(total_list.random(), event.message_id))
 
 
@@ -150,9 +130,9 @@ search_music = on_regex(r"^查歌.+")
 
 
 @search_music.handle()
-async def _(bot: Bot, event: Event, state: T_State):
+async def _(event: Event, message: Message = EventMessage()):
     regex = "查歌(.+)"
-    name = re.match(regex, str(event.get_message())).groups()[0].strip()
+    name = re.match(regex, str(message)).groups()[0].strip()
     if name == "":
         return
     res = total_list.filter(title_search=name)
@@ -164,12 +144,9 @@ async def _(bot: Bot, event: Event, state: T_State):
             search_result += f"{music['id']}. {music['title']}\n"
         await search_music.finish(Message([
             MessageSegment.reply(event.message_id), 
-            {
-                "type": "text",
-                "data": {
-                    "text": search_result.strip()
-                }
-        }]))
+            MessageSegment("text", {
+                "text": search_result.strip()
+            })]))
     else:
         await search_music.send(f"结果过多（{len(res)} 条），请缩小查询范围。")
 
@@ -178,9 +155,9 @@ query_chart = on_regex(r"^([绿黄红紫白]?)id([0-9]+)")
 
 
 @query_chart.handle()
-async def _(bot: Bot, event: Event, state: T_State):
+async def _(event: Event, message: Message = EventMessage()):
     regex = "([绿黄红紫白]?)id([0-9]+)"
-    groups = re.match(regex, str(event.get_message())).groups()
+    groups = re.match(regex, str(message)).groups()
     level_labels = ['绿', '黄', '红', '紫', '白']
     if groups[0] != "":
         try:
@@ -208,24 +185,16 @@ TOUCH: {chart['notes'][3]}
 BREAK: {chart['notes'][4]}
 谱师: {chart['charter']}'''
             await query_chart.send(Message([
-                MessageSegment.reply(event.message_id), {
-                    "type": "text",
-                    "data": {
-                        "text": f"{music['id']}. {music['title']}\n"
-                    }
-                },
-                {
-                    "type": "image",
-                    "data": {
-                        "file": f"{file}"
-                    }
-                },
-                {
-                    "type": "text",
-                    "data": {
-                        "text": msg
-                    }
-                }
+                MessageSegment.reply(event.message_id),
+                MessageSegment("text", {
+                    "text": f"{music['id']}. {music['title']}\n"
+                }),
+                MessageSegment("image", {
+                    "file": f"{file}"
+                }),
+                MessageSegment("text", {
+                    "text": msg
+                })
             ]))
         except Exception:
             await query_chart.send("未找到该谱面")
@@ -233,26 +202,18 @@ BREAK: {chart['notes'][4]}
         name = groups[1]
         music = total_list.by_id(name)
         try:
-            file =f"base64://{get_pic(music.id)}"
+            file = f"base64://{get_pic(music.id)}"
             await query_chart.send(Message([
-                MessageSegment.reply(event.message_id), {
-                    "type": "text",
-                    "data": {
-                        "text": f"{music['id']}. {music['title']}\n"
-                    }
-                },
-                {
-                    "type": "image",
-                    "data": {
-                        "file": f"{file}"
-                    }
-                },
-                {
-                    "type": "text",
-                    "data": {
-                        "text": f"艺术家: {music['basic_info']['artist']}\n分类: {music['basic_info']['genre']}\nBPM: {music['basic_info']['bpm']}\n版本: {music['basic_info']['from']}\n难度: {'/'.join(music['level'])}"
-                    }
-                }
+                MessageSegment.reply(event.message_id),
+                MessageSegment("text", {
+                    "text": f"{music['id']}. {music['title']}\n"
+                }),
+                MessageSegment("image", {
+                    "file": f"{file}"
+                }),
+                MessageSegment("text", {
+                    "text": f"艺术家: {music['basic_info']['artist']}\n分类: {music['basic_info']['genre']}\nBPM: {music['basic_info']['bpm']}\n版本: {music['basic_info']['from']}\n难度: {'/'.join(music['level'])}"
+                })
             ]))
         except Exception:
             await query_chart.send("未找到该乐曲")
@@ -265,7 +226,7 @@ jrwm = on_command('今日舞萌', aliases={'今日mai'})
 
 
 @jrwm.handle()
-async def _(bot: Bot, event: Event, state: T_State):
+async def _(event: Event, message: Message = CommandArg()):
     qq = int(event.get_user_id())
     h = hash(qq)
     rp = h % 100
@@ -282,16 +243,17 @@ async def _(bot: Bot, event: Event, state: T_State):
     s += "千雪提醒您：打机时不要大力拍打或滑动哦\n今日推荐歌曲："
     music = total_list[h % len(total_list)]
     await jrwm.finish(Message([
-        MessageSegment.reply(event.message_id), {"type": "text", "data": {"text": s}}
-    ] + song_txt(music)))
+        MessageSegment.reply(event.message_id), 
+        MessageSegment("text", {"text": s})] + song_txt(music)
+        ))
 
 query_score = on_command('分数线')
 
 
 @query_score.handle()
-async def _(bot: Bot, event: Event, state: T_State):
+async def _(event: Event, message: Message = CommandArg()):
     r = "([绿黄红紫白])(id)?([0-9]+)"
-    argv = str(event.get_message()).strip().split(" ")
+    argv = str(message).strip().split(" ")
     if len(argv) == 1 and argv[0] == '帮助':
         s = '''此功能为查找某首歌分数线设计。
 命令格式：分数线 <难度+歌曲id> <分数线>
@@ -304,12 +266,12 @@ HOLD\t2/5/10
 SLIDE\t3/7.5/15
 TOUCH\t1/2.5/5
 BREAK\t5/12.5/25(外加200落)'''
-        await query_score.send(Message([MessageSegment.reply(event.message_id), {
-            "type": "image",
-            "data": {
+        await query_score.send(Message([
+            MessageSegment.reply(event.message_id),
+            MessageSegment("image", {
                 "file": f"base64://{str(image_to_base64(text_to_image(s)), encoding='utf-8')}"
-            }
-        }]))
+            })
+        ]))
     elif len(argv) == 2:
         # try:
         grp = re.match(r, argv[0]).groups()
@@ -349,8 +311,8 @@ best_40_pic = on_command('b40')
 
 
 @best_40_pic.handle()
-async def _(bot: Bot, event: Event, state: T_State):
-    username = str(event.get_message()).strip()
+async def _(event: Event, message: Message = CommandArg()):
+    username = str(message).strip()
     if username == "":
         payload = {'qq': str(event.get_user_id())}
     else:
@@ -375,12 +337,9 @@ async def _(bot: Bot, event: Event, state: T_State):
         await best_40_pic.send("该用户禁止了其他人获取数据。")
     else:
         await best_40_pic.send(Message([
-            {
-                "type": "image",
-                "data": {
-                    "file": f"base64://{str(image_to_base64(img), encoding='utf-8')}"
-                }
-            }
+            MessageSegment("image", {
+                "file": f"base64://{str(image_to_base64(img), encoding='utf-8')}"
+            })
         ]))
 
 
@@ -388,8 +347,8 @@ best_50_pic = on_command('b50')
 
 
 @best_50_pic.handle()
-async def _(bot: Bot, event: Event, state: T_State):
-    username = str(event.get_message()).strip()
+async def _(event: Event, message: Message = CommandArg()):
+    username = str(message).strip()
     if username == "":
         payload = {'qq': str(event.get_user_id()), 'b50':True}
     else:
@@ -413,7 +372,7 @@ async def _(bot: Bot, event: Event, state: T_State):
 composer_search_music = on_regex(r"^曲师查歌.+")
 
 @composer_search_music.handle()
-async def _(bot: Bot, event: Event, state: T_State):
+async def _(event: Event):
     regex = "曲师查歌(.+)"
     composer_name = re.match(regex, str(event.get_message())).groups()[0].strip()
     if composer_name == "":
@@ -436,7 +395,7 @@ async def _(bot: Bot, event: Event, state: T_State):
 charter_search_music = on_regex(r"^谱师查歌.+")
 
 @charter_search_music.handle()
-async def _(bot: Bot, event: Event, state: T_State):
+async def _(event: Event):
     regex = "谱师查歌(.+)"
     charter_name = re.match(regex, str(event.get_message())).groups()[0].strip()
     if charter_name == "":
