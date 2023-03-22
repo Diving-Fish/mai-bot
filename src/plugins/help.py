@@ -25,7 +25,6 @@ XXXmaimaiXXX什么 随机一首歌
 [绿黄红紫白]id<歌曲编号> 查询乐曲信息或谱面信息
 定数查歌 <定数>  查询定数对应的乐曲
 定数查歌 <定数下限> <定数上限>
-<<<<<<< HEAD:src/plugins/help.py
 分数线 <难度+歌曲id> <分数线> 详情请输入“分数线 帮助”查看
 
 Extra:
@@ -51,14 +50,6 @@ XXXXXXXX 发送一张pixiv涩图
     ]))
         
 
-=======
-分数线 <难度+歌曲id> <分数线> 详情请输入“分数线 帮助”查看'''
-    await help.send(Message([
-        MessageSegment("image", {
-            "file": f"base64://{str(image_to_base64(text_to_image(help_str)), encoding='utf-8')}"
-        })
-    ]))
->>>>>>> 3f67be3... [UPDATE] Support python 3.10 and onebot v11:src/plugins/public.py
 
 
 async def _group_poke(bot: Bot, event: Event) -> bool:
