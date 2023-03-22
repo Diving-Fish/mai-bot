@@ -2,6 +2,9 @@ from nonebot import on_command, on_regex
 from nonebot.params import CommandArg, EventMessage
 from nonebot.adapters import Event
 from nonebot.adapters.onebot.v11 import Message, MessageSegment
+from nonebot.params import CommandArg, EventMessage
+from nonebot.adapters import Event
+from nonebot.adapters.onebot.v11 import Message, MessageSegment
 
 from src.libraries.tool import hash
 from src.libraries.maimaidx_music import *
@@ -70,6 +73,8 @@ inner_level = on_command('inner_level ', aliases={'定数查歌 '})
 @inner_level.handle()
 async def _(event: Event, message: Message = CommandArg()):
     argv = str(message).strip().split(" ")
+async def _(event: Event, message: Message = CommandArg()):
+    argv = str(message).strip().split(" ")
     if len(argv) > 2 or len(argv) == 0:
         await inner_level.finish("命令格式为\n定数查歌 <定数>\n定数查歌 <定数下限> <定数上限>")
         return
@@ -92,8 +97,10 @@ spec_rand = on_regex(r"^随个(?:dx|sd|标准)?[绿黄红紫白]?[0-9]+\+?")
 
 @spec_rand.handle()
 async def _(event: Event, message: Message = EventMessage()):
+async def _(event: Event, message: Message = EventMessage()):
     level_labels = ['绿', '黄', '红', '紫', '白']
     regex = "随个((?:dx|sd|标准))?([绿黄红紫白]?)([0-9]+\+?)"
+    res = re.match(regex, str(message).lower())
     res = re.match(regex, str(message).lower())
     try:
         if res.groups()[0] == "dx":
@@ -130,7 +137,9 @@ search_music = on_regex(r"^查歌.+")
 
 @search_music.handle()
 async def _(event: Event, message: Message = EventMessage()):
+async def _(event: Event, message: Message = EventMessage()):
     regex = "查歌(.+)"
+    name = re.match(regex, str(message)).groups()[0].strip()
     name = re.match(regex, str(message)).groups()[0].strip()
     if name == "":
         return
@@ -155,7 +164,9 @@ query_chart = on_regex(r"^([绿黄红紫白]?)id([0-9]+)")
 
 @query_chart.handle()
 async def _(event: Event, message: Message = EventMessage()):
+async def _(event: Event, message: Message = EventMessage()):
     regex = "([绿黄红紫白]?)id([0-9]+)"
+    groups = re.match(regex, str(message)).groups()
     groups = re.match(regex, str(message)).groups()
     level_labels = ['绿', '黄', '红', '紫', '白']
     if groups[0] != "":
@@ -226,6 +237,7 @@ jrwm = on_command('今日舞萌', aliases={'今日mai'})
 
 @jrwm.handle()
 async def _(event: Event, message: Message = CommandArg()):
+async def _(event: Event, message: Message = CommandArg()):
     qq = int(event.get_user_id())
     h = hash(qq)
     rp = h % 100
@@ -251,7 +263,9 @@ query_score = on_command('分数线')
 
 @query_score.handle()
 async def _(event: Event, message: Message = CommandArg()):
+async def _(event: Event, message: Message = CommandArg()):
     r = "([绿黄红紫白])(id)?([0-9]+)"
+    argv = str(message).strip().split(" ")
     argv = str(message).strip().split(" ")
     if len(argv) == 1 and argv[0] == '帮助':
         s = '''此功能为查找某首歌分数线设计。
@@ -269,6 +283,8 @@ BREAK\t5/12.5/25(外加200落)'''
             MessageSegment.reply(event.message_id),
             MessageSegment("image", {
                 "file": f"base64://{str(image_to_base64(text_to_image(s)), encoding='utf-8')}"
+            })
+        ]))
             })
         ]))
     elif len(argv) == 2:
@@ -312,6 +328,8 @@ best_40_pic = on_command('b40')
 @best_40_pic.handle()
 async def _(event: Event, message: Message = CommandArg()):
     username = str(message).strip()
+async def _(event: Event, message: Message = CommandArg()):
+    username = str(message).strip()
     if username == "":
         payload = {'qq': str(event.get_user_id())}
     else:
@@ -346,6 +364,8 @@ best_50_pic = on_command('b50')
 
 
 @best_50_pic.handle()
+async def _(event: Event, message: Message = CommandArg()):
+    username = str(message).strip()
 async def _(event: Event, message: Message = CommandArg()):
     username = str(message).strip()
     if username == "":
